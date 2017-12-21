@@ -19,9 +19,9 @@ set(TEST_SOURCE
 )
 
 add_library(unicode ${SOURCE} ${HEADERS})
-target_include_directories(unicode PRIVATE include)
+target_include_directories(unicode PUBLIC include)
 
-add_executable(tests WIN32 ${TEST_SOURCE})
+add_executable(tests ${TEST_SOURCE})
 target_link_libraries(tests PRIVATE unicode)
 
 add_test(tests tests)

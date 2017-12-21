@@ -5,7 +5,7 @@
 
 namespace unicode
 {
-// std::string to_utf8(std::u16string_view);
+  std::string to_utf8(std::u16string_view);
 // std::string to_utf8(std::u32string_view);
 
 // std::u16string to_utf16(std::u16string_view);
