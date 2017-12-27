@@ -11,13 +11,11 @@ using unicode::to_utf16;
 TEST_CASE("empty string")
 {
   REQUIRE(to_utf8(u"") == u8"");
-  REQUIRE(to_utf16(u8"") == u"");
 }
 
 TEST_CASE("ascii subset")
 {
   REQUIRE(to_utf8(u"abc123\u007F") == u8"abc123\u007F");
-  REQUIRE(to_utf16(u8"abc123\u007F") == u"abc123\u007F");
 }
 
 TEST_CASE("2byte utf8")
@@ -36,6 +34,19 @@ TEST_CASE("4byte utf8")
 {
   REQUIRE(to_utf8(u"\U00010000") == u8"\U00010000");
   REQUIRE(to_utf8(u"\U0010FFFF") == u8"\U0010FFFF");
+}
+
+TEST_CASE("to utf16")
+{
+  REQUIRE(to_utf16(u8"") == u"");
+  REQUIRE(to_utf16(u8"abc123\u007F") == u"abc123\u007F");
+  REQUIRE(to_utf16(u8"\u0080") == u"\u0080");
+  REQUIRE(to_utf16(u8"\u07FF") == u"\u07FF");
+  REQUIRE(to_utf16(u8"\u0800") == u"\u0800");
+  REQUIRE(to_utf16(u8"\uFFFF") == u"\uFFFF");
+  REQUIRE(to_utf16(u8"\U00010000") == u"\U00010000");
+  REQUIRE(to_utf16(u8"\U0010FFFF") == u"\U0010FFFF");
+  REQUIRE(to_utf16(u8"\U00024F5C") == u"\U00024F5C");
 }
 
 TEST_CASE("get next char from utf8 empty")

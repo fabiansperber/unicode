@@ -97,8 +97,15 @@ std::string to_utf8(std::u16string_view src)
 std::u16string to_utf16(std::string_view src)
 {
   std::u16string result;
-  for (auto const& c : src)
-    result.push_back(c);
+  for (auto const& c : Codepoints{ src })
+    if (c > 0xFFFF)
+    {
+      auto val = c - 0x10000;
+      result.push_back((0xD800 + (val >> 10)) & 0xFFFF);
+      result.push_back((0xDC00 + (c & 0x3FF)) & 0xFFFF);
+    }
+    else
+      result.push_back(c & 0xFFFF);
   return result;
 }
 }
