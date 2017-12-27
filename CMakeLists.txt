@@ -10,16 +10,14 @@ enable_testing()
 set(HEADERS
   include/unicode.h
 )
-set(SOURCE
-  src/unicode.cpp
-)
+
 set(TEST_SOURCE
   test/unicode.cpp
   test/catch.hpp
 )
 
-add_library(unicode ${SOURCE} ${HEADERS})
-target_include_directories(unicode PUBLIC include)
+add_library(unicode INTERFACE)
+target_include_directories(unicode INTERFACE include)
 
 add_executable(tests ${TEST_SOURCE})
 target_link_libraries(tests PRIVATE unicode)
