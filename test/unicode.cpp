@@ -1,8 +1,10 @@
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include <unicode.h>
+#include <deque>
 
 using unicode::get_next_char_from_utf8;
+using unicode::Codepoints;
 using unicode::to_utf8;
 using unicode::to_utf16;
 
@@ -61,6 +63,7 @@ TEST_CASE("get char from utf8")
   validate_get_next_char_from_utf8(u8"\U00010000", U'\U00010000');
   validate_get_next_char_from_utf8(u8"\U0010FFFF", U'\U0010FFFF');
 }
+
 inline void validate_get_next_char_from_utf8_invalid(std::string_view str)
 {
   char32_t c;
@@ -91,4 +94,23 @@ TEST_CASE("disallow invalid utf8")
   validate_get_next_char_from_utf8_invalid("\xBF\x80");
   // greater than allowed codepoints
   validate_get_next_char_from_utf8_invalid("\xF4\x90\x80\x80"); // U+0010FFFF+1
+}
+
+inline void validate_ranged_for(std::string_view str, std::deque<char32_t> expected)
+{
+  Codepoints cp{ str };
+  for (auto const& c : cp)
+  {
+    REQUIRE_FALSE(expected.empty());
+    REQUIRE(c == expected[0]);
+    expected.pop_front();
+  }
+  REQUIRE(expected.empty());
+  //REQUIRE(cp.text.empty());
+}
+TEST_CASE("iterate range based for")
+{
+  validate_ranged_for("abc", { U'a', U'b', U'c' });
+  validate_ranged_for(u8"\U00000080\U000007FF\U00000800\U0000FFFF\U00010000\U0010FFFF",
+    { U'\U00000080', U'\U000007FF' , U'\U00000800' , U'\U0000FFFF' , U'\U00010000' , U'\U0010FFFF' });
 }
