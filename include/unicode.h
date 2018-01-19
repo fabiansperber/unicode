@@ -31,7 +31,7 @@ struct Codepoints
   iterator end() const { return {}; }
 };
 static inline std::string to_utf8(std::u16string_view);
-// std::string to_utf8(std::u32string_view);
+static inline std::string to_utf8(std::u32string_view);
 
 static inline std::u16string to_utf16(std::string_view src);
 // std::u16string to_utf16(std::u32string_view);
@@ -116,6 +116,35 @@ static inline std::string to_utf8(std::u16string_view src)
       if (c > 0xDBFF)
         throw "unexpected low surrogate";
       last = c;
+      continue;
+    }
+    if (c > 0x7FF) {
+      result.push_back(0xE0 | static_cast<const char>((c >> 12) & 0xF));
+      result.push_back(0x80 | static_cast<const char>((c >> 6) & 0x3F));
+      result.push_back(0x80 | (static_cast<const char>(c & 0x3F)));
+      continue;
+    }
+    if (c > 0x7f) {
+      result.push_back(0xC0 | static_cast<const char>(c >> 6));
+      result.push_back(0x80 | (static_cast<const char>(c) & 0x3F));
+      continue;
+    }
+    result.push_back(static_cast<const char>(c));
+  }
+  return result;
+}
+static inline std::string to_utf8(std::u32string_view src)
+{
+  std::string result;
+  for (auto const& c : src)
+  {
+    if (c > 0x10FFFF)
+      throw "invalid codepoint";
+    if (c > 0xFFFF) {
+      result.push_back(0xF0 | static_cast<const char>((c >> 18) & 0x7));
+      result.push_back(0x80 | static_cast<const char>((c >> 12) & 0x3F));
+      result.push_back(0x80 | static_cast<const char>((c >> 6) & 0x3F));
+      result.push_back(0x80 | (static_cast<const char>(c & 0x3F)));
       continue;
     }
     if (c > 0x7FF) {
