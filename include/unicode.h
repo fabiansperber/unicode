@@ -59,7 +59,7 @@ static inline bool get_next_char_from_utf8(std::string_view &text, char32_t &cha
     bool check_for_surrogate = character == 0xED;
     bool check_for_overlong_three = character == 0xE0;
     bool check_for_overlong_four = character == 0xF0;
-    auto num_chars_following =
+    size_t num_chars_following =
       (character >= 0xF0) ? 3 :
       (character >= 0xE0) ? 2 : 1;
     if (text.size() < num_chars_following)
@@ -71,7 +71,7 @@ static inline bool get_next_char_from_utf8(std::string_view &text, char32_t &cha
     character = character & ~mask;
 
     bool found_invalid_char = false;
-    for (auto i = 0; i < num_chars_following; ++i) {
+    for (size_t i = 0; i < num_chars_following; ++i) {
       if ((text[i] & 0xC0) != 0x80)
       {
         // not a valid follow char
